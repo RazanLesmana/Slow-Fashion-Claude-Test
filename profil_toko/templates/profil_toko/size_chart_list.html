@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Size Chart · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'profil_toko/profil_toko.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="page-head">
+    <div>
+      <h1>Size Chart</h1>
+      <p class="muted">Ukuran lingkar dada dan panjang per brand, dalam cm.</p>
+    </div>
+    {% if can_create %}
+      <a href="{% url 'profil_toko:size_chart_create' %}" class="btn-primary">+ Tambah Size Chart</a>
+    {% endif %}
+  </div>
+
+  <nav class="chips size-chart-brands" aria-label="Filter brand">
+    <a href="{% url 'profil_toko:size_chart_list' %}" class="chip{% if not selected_brand %} active{% endif %}">Semua</a>
+    {% for brand in brands %}
+      <a href="?brand={{ brand|urlencode }}" class="chip{% if selected_brand|lower == brand|lower %} active{% endif %}">{{ brand }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="size-chart-groups" id="size-chart-groups">
+    {% for group in groups %}
+      <article class="size-chart-group" data-group>
+        <h2 class="store-section-title">{{ group.brand }}</h2>
+        <table class="size-table">
+          <thead>
+            <tr><th scope="col">Size</th><th scope="col">Lingkar dada</th><th scope="col">Panjang</th><th scope="col"><span class="visually-hidden">Aksi</span></th></tr>
+          </thead>
+          <tbody>
+            {% for chart in group.rows %}
+              <tr data-chart-row>
+                <td>{{ chart.size }}</td>
+                <td>{{ chart.chest_cm }} cm</td>
+                <td>{{ chart.length_cm }} cm</td>
+                <td class="size-actions">
+                  {% if user.is_authenticated and user.is_superuser or user.is_authenticated and chart.created_by_id == user.pk %}
+                    <a href="{% url 'profil_toko:size_chart_edit' chart.pk %}" class="link-btn underline">Edit</a>
+                    <button type="button" class="link-btn underline danger" data-chart-delete
+                            data-url="{% url 'profil_toko:size_chart_delete' chart.pk %}"
+                            data-label="{{ chart.brand }} {{ chart.size }}">Hapus</button>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </article>
+    {% endfor %}
+    <div class="empty-state" id="size-chart-empty" {% if groups %}hidden{% endif %}>
+      <h3>Belum ada size chart</h3>
+      <p>{% if selected_brand %}Size chart untuk brand {{ selected_brand }} belum tersedia.{% else %}Belum ada data size chart.{% endif %}</p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'profil_toko/profil_toko.js' %}"></script>{% endblock %}
