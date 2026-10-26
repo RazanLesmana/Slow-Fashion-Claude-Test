@@ -1,40 +1,77 @@
 {% extends "base.html" %}
+{% load static %}
+{% block title %}Profil Saya · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'akun/akun.css' %}">{% endblock %}
+
 {% block content %}
-<div class="auth-box">
-  <h2>Profil Saya</h2>
-  <p>Username: {{ profile.user.username }}</p>
-  <p>Status: {% if profile.is_seller %}Seller{% else %}Buyer{% endif %}</p>
+<section class="section profil-page">
+  <div class="page-head">
+    <h1>Profil Saya</h1>
+  </div>
 
-  <form method="POST">
-    {% csrf_token %}
-    <label>Bio</label>
-    <textarea name="bio">{{ profile.bio }}</textarea>
-    <button type="submit" class="btn-primary">Simpan</button>
-  </form>
+  <div class="profil-grid">
+    <article class="profil-card">
+      <h2 class="profil-card-title">Info Akun</h2>
+      <div class="profil-identity">
+        <span class="avatar avatar-lg">{{ profile.user.username|first }}</span>
+        <div>
+          <p class="profil-username">{{ profile.user.username }}</p>
+          <p class="muted">Bergabung sejak {{ profile.user.date_joined|date:"j M Y" }}</p>
+        </div>
+      </div>
+    </article>
 
-  <button id="toggleSeller" class="btn-outline">
-    {% if profile.is_seller %}Nonaktifkan{% else %}Jadi{% endif %} Seller
-  </button>
+    <article class="profil-card" id="bio-card">
+      <div class="profil-card-head">
+        <h2 class="profil-card-title">Bio</h2>
+        <button type="button" class="link-btn underline" id="bio-edit-btn">Edit</button>
+      </div>
+      <p id="bio-text" class="profil-bio{% if not profile.bio %} muted{% endif %}" data-empty-text="Belum ada bio.">{{ profile.bio|default:"Belum ada bio." }}</p>
 
-  <form method="POST" action="{% url 'akun:hapus_akun' %}" onsubmit="return confirm('Yakin hapus akun?');">
-    {% csrf_token %}
-    <button type="submit" class="btn-danger">Hapus Akun</button>
-  </form>
-</div>
+      <form id="bio-form" method="post" action="{% url 'akun:edit_profil' %}" hidden novalidate>
+        {% csrf_token %}
+        <div class="field">
+          <div class="profil-field-head">
+            <label for="{{ form.bio.id_for_label }}">{{ form.bio.label }}</label>
+            <span class="field-help"><span id="bio-count">{{ profile.bio|length }}</span>/200</span>
+          </div>
+          {{ form.bio }}
+          <p class="field-error" id="bio-error" hidden></p>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn-primary btn-sm">Simpan</button>
+          <button type="button" class="btn-outline btn-sm" id="bio-cancel-btn">Batal</button>
+        </div>
+      </form>
+    </article>
 
-<script>
-document.getElementById("toggleSeller").addEventListener("click", async () => {
-  const res = await fetch("{% url 'akun:toggle_seller' %}", {
-    method: "POST",
-    headers: {"X-CSRFToken": getCookie("csrftoken")}
-  });
-  await res.json();
-  location.reload();
-});
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(";").shift();
-}
-</script>
+    <article class="profil-card" id="seller-card">
+      <h2 class="profil-card-title">Status Akun</h2>
+      <p class="profil-status">
+        Status: <span class="badge {% if profile.is_seller %}badge-active{% endif %}" id="seller-status">{% if profile.is_seller %}Seller{% else %}Buyer{% endif %}</span>
+      </p>
+      <p class="muted" id="seller-desc"
+         data-seller-text="Kamu bisa menjual barang dan mengelola toko."
+         data-buyer-text="Aktifkan mode seller untuk mulai menjual baju preloved.">
+        {% if profile.is_seller %}Kamu bisa menjual barang dan mengelola toko.{% else %}Aktifkan mode seller untuk mulai menjual baju preloved.{% endif %}
+      </p>
+      <div class="btn-row">
+        <button type="button" id="toggleSeller" class="{% if profile.is_seller %}btn-outline{% else %}btn-primary{% endif %}"
+                data-url="{% url 'akun:toggle_seller' %}">
+          {% if profile.is_seller %}Nonaktifkan Seller{% else %}Jadi Seller{% endif %}
+        </button>
+        <a href="{% url 'listing:my_listings' %}" class="btn-outline" data-seller-nav {% if not profile.is_seller %}hidden{% endif %}>My Listings</a>
+        <a href="{% url 'profil_toko:toko_saya' %}" class="btn-outline" data-seller-nav {% if not profile.is_seller %}hidden{% endif %}>Toko Saya</a>
+      </div>
+    </article>
+
+    <article class="profil-card profil-danger">
+      <h2 class="profil-card-title">Zona Bahaya</h2>
+      <p class="muted">Menghapus akun akan menghapus profil, listing, dan data lain milikmu secara permanen.</p>
+      <button type="button" class="btn-danger" id="delete-account-btn" data-url="{% url 'akun:hapus_akun' %}">Hapus Akun</button>
+    </article>
+  </div>
+</section>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'akun/akun.js' %}"></script>{% endblock %}
