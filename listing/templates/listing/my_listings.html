@@ -1,90 +1,92 @@
 {% extends "base.html" %}
-{% load format_tags %}
+{% load static format_tags %}
+{% block title %}My Listings · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'listing/listing.css' %}">{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="section-head">
+<section class="section" id="my-listings" data-selected-status="{{ selected_status }}">
+    <div class="page-head">
         <h1>My Listings</h1>
-
-        <a href="{% url 'listing:product_create' %}"
-           class="btn-primary">
-            + Tambah Produk
-        </a>
+        <a href="{% url 'listing:product_create' %}" class="btn-primary">+ Tambah Listing</a>
     </div>
 
-
-    <form method="get">
-        <label for="status">Status:</label>
-
-        <select name="status" id="status">
-            <option value="">Semua Status</option>
-
+    <div class="listing-filters">
+        <nav class="chips" aria-label="Filter status">
+            <a href="?{% if selected_category %}category={{ selected_category }}{% endif %}"
+               class="chip{% if not selected_status %} active{% endif %}">
+                Semua · <span data-count="semua">{{ counts.semua }}</span>
+            </a>
             {% for value, label in status_choices %}
-                <option value="{{ value }}"
-                    {% if selected_status == value %}selected{% endif %}>
-                    {{ label }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <label for="category">Kategori:</label>
-
-        <select name="category" id="category">
-            <option value="">Semua Kategori</option>
-
-            {% for value, label in category_choices %}
-                <option value="{{ value }}"
-                    {% if selected_category == value %}selected{% endif %}>
-                    {{ label }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit">Filter</button>
-        <a href="{% url 'listing:my_listings' %}">Reset</a>
-    </form>
-
-    <hr>
-
-    {% for product in products %}
-        <article class="product-card">
-            {% with first_image=product.images.first %}
-                {% if first_image %}
-                    <img
-                        src="{{ first_image.image.url }}"
-                        alt="{{ first_image.alt_text|default:product.name }}"
-                        width="200"
-                    >
-                {% endif %}
-            {% endwith %}
-
-            <div class="product-info">
-                <h2>{{ product.name }}</h2>
-
-                <p>
-                    Brand:
-                    {{ product.brand|default:"Tanpa brand" }}
-                </p>
-
-                <p>
-                    Kategori: {{ product.get_category_display }}
-                </p>
-
-                <p>
-                    Harga: {{ product.price|rupiah }}
-                </p>
-
-                <p>
-                    Status: {{ product.get_status_display }}
-                </p>
-
-                <a href="{% url 'listing:product_detail' product.pk %}">
-                    Lihat Detail
+                <a href="?status={{ value }}{% if selected_category %}&category={{ selected_category }}{% endif %}"
+                   class="chip{% if selected_status == value %} active{% endif %}">
+                    {{ label }} · <span data-count="{{ value }}">{% if value == "active" %}{{ counts.active }}{% else %}{{ counts.sold }}{% endif %}</span>
                 </a>
+            {% endfor %}
+        </nav>
+
+        <form method="get" class="listing-category-filter" id="category-filter">
+            {% if selected_status %}<input type="hidden" name="status" value="{{ selected_status }}">{% endif %}
+            <label for="category" class="field-label">Kategori</label>
+            <select name="category" id="category" class="input">
+                <option value="">Semua Kategori</option>
+                {% for value, label in category_choices %}
+                    <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="btn-outline btn-sm">Filter</button></noscript>
+        </form>
+    </div>
+
+    <div class="listing-table" id="listing-table">
+        <div class="listing-row listing-row-head" {% if not products %}hidden{% endif %}>
+            <span>Produk</span>
+            <span>Harga</span>
+            <span>Status</span>
+            <span>Ditambahkan</span>
+            <span></span>
+        </div>
+
+        {% for product in products %}
+            {% with image=product.images.all.0 %}
+            <div class="listing-row" data-product-row data-status="{{ product.status }}">
+                <div class="listing-product">
+                    <a href="{% url 'listing:product_detail' product.pk %}" class="listing-thumb">
+                        {% if image %}<img src="{{ image.image.url }}" alt="{{ product.name }}">{% endif %}
+                    </a>
+                    <div>
+                        <a href="{% url 'listing:product_detail' product.pk %}" class="listing-name">{{ product.name }}</a>
+                        <p class="meta">{% if product.brand %}{{ product.brand }} · {% endif %}{{ product.size }} · {{ product.get_condition_display }}</p>
+                        <p class="listing-price-mobile">{{ product.price|rupiah }}</p>
+                    </div>
+                </div>
+                <span class="listing-price">{{ product.price|rupiah }}</span>
+                <span>
+                    <span class="badge {% if product.status == 'active' %}badge-active{% else %}badge-sold{% endif %}" data-status-badge>{{ product.get_status_display }}</span>
+                </span>
+                <span class="listing-date muted">{{ product.created_at|date:"j M Y" }}</span>
+                <div class="listing-actions">
+                    <a href="{% url 'listing:product_edit' product.pk %}" class="link-btn underline">Edit</a>
+                    <button type="button" class="link-btn underline" data-status-toggle
+                            data-status="{{ product.status }}"
+                            data-sold-url="{% url 'listing:product_mark_sold' product.pk %}"
+                            data-active-url="{% url 'listing:product_mark_active' product.pk %}">
+                        {% if product.status == "active" %}Tandai Sold{% else %}Tandai Aktif{% endif %}
+                    </button>
+                    <button type="button" class="link-btn underline danger" data-delete
+                            data-url="{% url 'listing:product_delete' product.pk %}"
+                            data-name="{{ product.name }}">Hapus</button>
+                </div>
             </div>
-        </article>
-    {% empty %}
-        <p>Belum ada produk yang sesuai dengan filter.</p>
-    {% endfor %}
+            {% endwith %}
+        {% endfor %}
+
+        <div class="empty-state" id="listing-empty" {% if products %}hidden{% endif %}>
+            <h2>Belum ada produk</h2>
+            <p>Belum ada produk yang sesuai dengan filter.</p>
+            <a href="{% url 'listing:product_create' %}" class="btn-outline">Tambah Listing</a>
+        </div>
+    </div>
 </section>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'listing/listing.js' %}"></script>{% endblock %}
