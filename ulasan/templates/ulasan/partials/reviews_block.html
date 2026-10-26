@@ -1,0 +1,52 @@
+{% load review_tags %}{{ assets }}
+<div class="reviews" data-reviews data-kind="{{ kind }}" data-list-url="{{ list_url }}">
+  <div class="reviews-head">
+    <div>
+      <h2 class="reviews-title">{{ title }}</h2>
+      <p class="reviews-summary">
+        <span class="reviews-avg" data-summary-avg>{% if summary.count %}{{ summary.average|floatformat:1 }}{% else %}–{% endif %}</span>
+        <span class="stars" data-summary-stars aria-hidden="true">{% for on in summary.average|stars %}<span class="star{% if on %} on{% endif %}">★</span>{% endfor %}</span>
+        <span class="muted"><span data-summary-count>{{ summary.count }}</span> ulasan</span>
+      </p>
+    </div>
+    <label class="reviews-sort">
+      <span class="visually-hidden">Urutkan ulasan</span>
+      <select class="input" data-review-sort>
+        {% for value, label in sort_options %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+
+  {% if not authenticated %}
+    <p class="reviews-note"><a href="{{ login_url }}" class="text-link">Masuk untuk menulis ulasan</a></p>
+  {% elif is_target_owner %}
+    <p class="reviews-note muted">{% if kind == "product" %}Ini produk milikmu, jadi kamu tidak bisa mengulasnya.{% else %}Ini tokomu, jadi kamu tidak bisa mengulasnya.{% endif %}</p>
+  {% else %}
+    <p class="reviews-note muted" data-already-note {% if not already_reviewed %}hidden{% endif %}>Kamu sudah memberi ulasan. Kamu bisa mengedit atau menghapusnya di bawah.</p>
+    <form method="post" action="{{ create_url }}" class="review-form" data-review-form {% if already_reviewed %}hidden{% endif %} novalidate>
+      <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+      <fieldset class="star-input">
+        <legend class="field-label">Rating</legend>
+        <div class="star-input-row">
+          {% for value in rating_values %}
+            <input type="radio" name="rating" id="{{ kind }}-rating-{{ value }}" value="{{ value }}">
+            <label for="{{ kind }}-rating-{{ value }}" title="{{ value }} bintang"><span aria-hidden="true">★</span><span class="visually-hidden">{{ value }} bintang</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <div class="field">
+        <label for="{{ kind }}-review-comment">Komentar</label>
+        <textarea name="comment" id="{{ kind }}-review-comment" rows="3" maxlength="1000" placeholder="{{ form.comment.field.widget.attrs.placeholder }}"></textarea>
+      </div>
+      <p class="field-error" data-form-error hidden></p>
+      <button type="submit" class="btn-primary btn-sm">Kirim Ulasan</button>
+    </form>
+  {% endif %}
+
+  <ul class="review-list" data-review-list>
+    {% for review in reviews %}
+      {% include "ulasan/partials/review_item.html" %}
+    {% endfor %}
+  </ul>
+  <p class="muted reviews-empty" data-review-empty {% if reviews %}hidden{% endif %}>Belum ada ulasan.</p>
+</div>

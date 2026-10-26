@@ -1,0 +1,19 @@
+{% load review_tags %}
+{% comment %}Satu ulasan. Struktur sama dengan renderReview() di ulasan.js.{% endcomment %}
+<li class="review-item" data-review-id="{{ review.id }}">
+  <div class="review-meta">
+    <span class="avatar review-avatar">{{ review.author|first }}</span>
+    <div class="review-who">
+      <strong class="review-author">{{ review.author }}</strong>
+      <span class="muted review-date">{{ review.created_display }}{% if review.edited %} · diedit{% endif %}</span>
+    </div>
+    <span class="stars" aria-label="{{ review.rating }} dari 5 bintang">{% for on in review.rating|stars %}<span class="star{% if on %} on{% endif %}" aria-hidden="true">★</span>{% endfor %}</span>
+  </div>
+  <p class="review-comment">{{ review.comment|linebreaksbr }}</p>
+  {% if review.is_owner %}
+    <div class="review-actions">
+      <button type="button" class="link-btn underline" data-review-edit data-url="{{ review.edit_url }}">Edit</button>
+      <button type="button" class="link-btn underline danger" data-review-delete data-url="{{ review.delete_url }}">Hapus</button>
+    </div>
+  {% endif %}
+</li>
