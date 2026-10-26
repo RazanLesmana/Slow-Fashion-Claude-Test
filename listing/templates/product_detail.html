@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <a href="{% url 'listing:my_listings' %}">
+        &larr; Kembali ke My Listings
+    </a>
+
+    <h1>{{ product.name }}</h1>
+
+    <div class="product-images">
+        {% for product_image in product.images.all %}
+            <figure>
+                <img
+                    src="{{ product_image.image.url }}"
+                    alt="{{ product_image.alt_text|default:product.name }}"
+                    width="250"
+                >
+                {% if product_image.alt_text %}
+                    <figcaption>
+                        {{ product_image.alt_text }}
+                    </figcaption>
+                {% endif %}
+            </figure>
+        {% empty %}
+            <p>Belum ada foto untuk produk ini.</p>
+        {% endfor %}
+    </div>
+
+    <div class="product-details">
+        <p>
+            <strong>Brand:</strong>
+            {{ product.brand|default:"Tanpa brand" }}
+        </p>
+
+        <p>
+            <strong>Deskripsi:</strong>
+            {{ product.description|linebreaksbr }}
+        </p>
+
+        <p>
+            <strong>Kategori:</strong>
+            {{ product.get_category_display }}
+        </p>
+
+        <p>
+            <strong>Ukuran:</strong>
+            {{ product.size }}
+        </p>
+
+        <p>
+            <strong>Kondisi:</strong>
+            {{ product.get_condition_display }}
+        </p>
+
+        <p>
+            <strong>Harga:</strong>
+            Rp {{ product.price }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ product.get_status_display }}
+        </p>
+    </div>
+
+    <div class="product-actions">
+        <a
+            href="{% url 'listing:product_edit' product.pk %}"
+            class="btn-primary"
+        >
+            Edit Produk
+        </a>
+    </div>
+</section>
+{% endblock %}
