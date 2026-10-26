@@ -342,6 +342,7 @@ class JsonEndpointTests(TestCase):
         self.assertEqual(self.client.get(reverse("listing:my_products_json")).status_code, 403)
 
 
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
 class SeedListingTests(TestCase):
 
     def test_seed_tanpa_seller_keluar_rapi(self):
@@ -359,3 +360,26 @@ class SeedListingTests(TestCase):
         self.assertEqual(Product.objects.count(), count)
         self.assertGreaterEqual(count, 18)
         self.assertTrue(Product.objects.filter(status="sold").exists())
+
+    def test_seed_membuat_foto_placeholder_sekali(self):
+        make_user("seller1", is_seller=True)
+        make_user("seller2", is_seller=True)
+        call_command("seed_listing", stdout=StringIO())
+        total = ProductImage.objects.count()
+        self.assertGreaterEqual(total, Product.objects.count())
+        self.assertEqual(Product.objects.get(name="Linen blazer krem").images.count(), 3)
+        self.assertEqual(Product.objects.get(name="Parka olive").images.count(), 1)
+        # Produk yang sudah punya foto tidak ditambah lagi.
+        call_command("seed_listing", stdout=StringIO())
+        self.assertEqual(ProductImage.objects.count(), total)
+
+    def test_seed_menambah_foto_ke_produk_lama_dan_opsi_no_images(self):
+        make_user("seller1", is_seller=True)
+        make_user("seller2", is_seller=True)
+        call_command("seed_listing", "--no-images", stdout=StringIO())
+        self.assertFalse(ProductImage.objects.exists())
+        call_command("seed_listing", stdout=StringIO())
+        self.assertEqual(Product.objects.filter(images__isnull=True).count(), 0)
+        image = ProductImage.objects.first()
+        self.assertTrue(image.image.name.endswith(".jpg"))
+        self.assertTrue(image.alt_text)
