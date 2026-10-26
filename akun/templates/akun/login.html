@@ -1,12 +1,35 @@
 {% extends "base.html" %}
+{% block title %}Masuk · LaPAKAIAN{% endblock %}
 {% block content %}
-<div class="auth-box">
-  <h2>Masuk</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn-primary">Masuk</button>
-  </form>
-  <p>Belum punya akun? <a href="{% url 'akun:register' %}">Daftar</a></p>
-</div>
+<section class="auth-split">
+  <div class="auth-box">
+    <h1>Masuk</h1>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="field{% if form.username.errors %} has-error{% endif %}">
+        <label for="{{ form.username.id_for_label }}">Nama pengguna</label>
+        <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
+               value="{{ form.username.value|default_if_none:'' }}" autocomplete="username" autofocus required>
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="field{% if form.password.errors %} has-error{% endif %}">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}"
+               autocomplete="current-password" required>
+        {% for error in form.password.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary btn-block">Masuk</button>
+    </form>
+    <p>Belum punya akun? <a href="{% url 'akun:register' %}" class="text-link">Daftar</a></p>
+  </div>
+  <div class="auth-photo img-placeholder" aria-hidden="true">Foto editorial</div>
+</section>
 {% endblock %}

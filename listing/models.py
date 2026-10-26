@@ -1,7 +1,15 @@
-from django.db import models
-
 from django.conf import settings
 from django.db import models
+
+
+class ProductQuerySet(models.QuerySet):
+
+    def active(self):
+        return self.filter(status="active")
+
+    def public(self):
+        """Produk aktif milik seller yang masih aktif (tampil di katalog)."""
+        return self.active().filter(seller__profile__is_seller=True)
 
 
 class Product(models.Model):
@@ -69,6 +77,8 @@ class Product(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = ProductQuerySet.as_manager()
 
     class Meta:
         ordering = ["-created_at"]

@@ -1,3 +1,14 @@
-from django.shortcuts import render
+from lapakaian.views import coming_soon
 
-# Create your views here.
+
+# Stub sementara, diganti oleh branch profil-toko.
+def buka_toko(request):
+    return coming_soon(request, "Buka Toko")
+
+
+def toko_saya(request):
+    return coming_soon(request, "Toko Saya")
+
+
+def detail(request, username):
+    return coming_soon(request, "Profil Toko")
