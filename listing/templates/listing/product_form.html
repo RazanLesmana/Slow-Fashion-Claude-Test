@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+    <h1>{{ page_title }}</h1>
+    <p>Lengkapi informasi produk yang ingin kamu jual.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <h2>Informasi Produk</h2>
+        {{ form.as_p }}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <h2>Foto Produk</h2>
+        <p>Unggah maksimal 5 foto untuk satu produk.</p>
+
+        {{ image_formset.management_form }}
+
+        {% if image_formset.non_form_errors %}
+            <div class="form-errors">
+                {{ image_formset.non_form_errors }}
+            </div>
+        {% endif %}
+
+        {% for image_form in image_formset %}
+            <div class="image-form">
+                {{ image_form.as_p }}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-primary">
+            {% if product %}
+                Simpan Perubahan
+            {% else %}
+                Simpan Produk
+            {% endif %}
+        </button>
+
+        <a href="{% url 'listing:my_listings' %}" class="btn-outline">
+            Batal
+        </a>
+    </form>
+</section>
+{% endblock %}

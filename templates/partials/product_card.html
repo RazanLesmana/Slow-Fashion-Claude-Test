@@ -1,0 +1,26 @@
+{% load format_tags %}
+{% comment %}
+  Kartu produk bersama. Context: product (listing.Product).
+  Struktur ini juga dibangun ulang oleh renderProductCard() di static/js/utils.js,
+  jadi kalau markup diubah, ubah juga fungsi itu.
+{% endcomment %}
+{% with image=product.images.all.0 %}
+<article class="product-card{% if product.status == 'sold' %} is-sold{% endif %}" data-product-id="{{ product.pk }}">
+  <div class="product-media">
+    <a href="{% url 'listing:product_detail' product.pk %}" class="product-image" aria-label="{{ product.name }}">
+      {% if image %}
+        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" loading="lazy">
+      {% endif %}
+    </a>
+    {% if product.status == "sold" %}
+      <span class="badge badge-sold product-flag">Sold</span>
+    {% endif %}
+    {% include "product_catalog/slots/wishlist_button.html" %}
+  </div>
+  <div class="product-info">
+    <a href="{% url 'listing:product_detail' product.pk %}" class="product-name">{{ product.name }}</a>
+    <div class="price">{{ product.price|rupiah }}</div>
+    <div class="meta">{% if product.brand %}{{ product.brand }} · {% endif %}{{ product.size }} · {{ product.get_condition_display }}</div>
+  </div>
+</article>
+{% endwith %}

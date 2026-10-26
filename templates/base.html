@@ -4,32 +4,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaPAKAIAN</title>
-  {% load static %}
+  <title>{% block title %}LaPAKAIAN{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'global/style.css' %}">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
 </head>
-<body>
- <nav class="navbar">
-  <a href="{% url 'landing' %}" class="logo">LaPAKAIAN</a>
-  <div class="nav-links">
-    <a href="#">Katalog</a>
-    <a href="#">Kategori</a>
-    {% if user.is_authenticated %}
-      {% if user.profile.is_seller %}
-        <a href="#">My Listings</a>
-        <a href="#">Toko Saya</a>
-      {% endif %}
-      <a href="{% url 'akun:profil' %}">{{ user.username }}</a>
-      <a href="{% url 'akun:logout' %}">Keluar</a>
-    {% else %}
-      <a href="{% url 'akun:login' %}">Masuk</a>
-      <a href="{% url 'akun:register' %}">Daftar</a>
-    {% endif %}
-  </div>
-</nav>
+<body data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+      data-login-url="{% url 'akun:login' %}">
+  {% include "partials/header.html" %}
+
+  {% if messages %}
+    <div class="messages" role="status">
+      {% for message in messages %}
+        <p class="message{% if message.tags %} message-{{ message.tags }}{% endif %}">{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <main>
     {% block content %}{% endblock %}
   </main>
+
+  {% include "partials/footer.html" %}
+
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="{% static 'js/utils.js' %}"></script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>

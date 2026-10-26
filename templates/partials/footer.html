@@ -1,0 +1,27 @@
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="{% url 'landing' %}" class="logo">LaPAKAIAN</a>
+      <p>Baju bagus layak dipakai lagi.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <p class="footer-title">Belanja</p>
+        <a href="{% url 'product_catalog:katalog' %}">Katalog</a>
+        <a href="{% url 'product_catalog:katalog' %}">Kategori</a>
+        <a href="{% url 'product_catalog:wishlist' %}">Wishlist</a>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Jual</p>
+        <a href="{% url 'akun:profil' %}">Jadi Seller</a>
+        <a href="{% url 'listing:my_listings' %}">My Listings</a>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Tentang</p>
+        <a href="{% url 'landing' %}">Tentang LaPAKAIAN</a>
+        <a href="{% url 'landing' %}">Syarat &amp; Ketentuan</a>
+      </div>
+    </div>
+  </div>
+  <p class="footer-bottom">© 2026 LaPAKAIAN · Proyek PBP Kelompok A-6, Fasilkom UI</p>
+</footer>

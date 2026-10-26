@@ -1,0 +1,41 @@
+{% load format_tags %}
+<nav class="navbar">
+  <a href="{% url 'landing' %}" class="logo">LaPAKAIAN</a>
+
+  <button type="button" class="nav-toggle" aria-label="Buka menu" aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="nav-links" id="nav-links">
+    <a href="{% url 'product_catalog:katalog' %}">Katalog</a>
+
+    <div class="nav-dropdown">
+      <button type="button" class="nav-dropdown-toggle" aria-expanded="false">Kategori ▾</button>
+      <div class="nav-dropdown-menu">
+        {% product_categories as categories %}
+        {% for value, label in categories %}
+          <a href="{% url 'product_catalog:katalog' %}?category={{ value }}">{{ label }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'product_catalog:wishlist' %}">Wishlist</a>
+      {% comment %}
+        Menu seller selalu dirender untuk user login, tapi disembunyikan
+        (atribut hidden) kalau bukan seller, supaya JS bisa menampilkannya
+        lagi setelah toggle seller tanpa reload.
+      {% endcomment %}
+      <a href="{% url 'listing:my_listings' %}" data-seller-nav {% if not user.profile.is_seller %}hidden{% endif %}>My Listings</a>
+      <a href="{% url 'profil_toko:toko_saya' %}" data-seller-nav {% if not user.profile.is_seller %}hidden{% endif %}>Toko Saya</a>
+      <a href="{% url 'akun:profil' %}">{{ user.username }}</a>
+      <form method="post" action="{% url 'akun:logout' %}" class="nav-logout">
+        {% csrf_token %}
+        <button type="submit" class="link-btn">Keluar</button>
+      </form>
+    {% else %}
+      <a href="{% url 'akun:login' %}">Masuk</a>
+      <a href="{% url 'akun:register' %}" class="btn-primary btn-sm">Daftar</a>
+    {% endif %}
+  </div>
+</nav>

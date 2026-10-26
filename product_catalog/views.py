@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from lapakaian.views import coming_soon
 
-# Create your views here.
+
+# Stub sementara, diganti oleh branch product-catalog.
+def katalog(request):
+    return coming_soon(request, "Katalog")
+
+
+def wishlist(request):
+    return coming_soon(request, "Wishlist")
