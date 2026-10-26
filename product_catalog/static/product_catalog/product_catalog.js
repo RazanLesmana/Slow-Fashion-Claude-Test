@@ -3,6 +3,12 @@
  * {% wishlist_js %} (dari slot tombol wishlist atau halaman katalog/wishlist).
  */
 (() => {
+  // Slot bisa memuat <link> CSS di dalam grid produk. Pindahkan ke <head> supaya
+  // gaya tidak ikut hilang saat grid dirender ulang JS (mis. tab di halaman toko).
+  document.querySelectorAll('body link[rel="stylesheet"][href*="product_catalog/product_catalog"]').forEach((link) => {
+    document.head.appendChild(link);
+  });
+
   const dataEl = document.getElementById("wishlist-data");
   const data = dataEl ? JSON.parse(dataEl.textContent) : { ids: [], toggle_url: "" };
   const wishlistIds = new Set(data.ids);
