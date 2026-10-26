@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load wishlist_tags %}
+{% block title %}Wishlist · LaPAKAIAN{% endblock %}
+{% block extra_css %}{% wishlist_css %}{% endblock %}
+
+{% block content %}
+<section class="section wishlist-page" id="wishlist-page">
+  <div class="page-head">
+    <h1>Wishlist</h1>
+    <span class="muted"><span id="wishlist-count">{{ total }}</span> barang</span>
+  </div>
+
+  {% if total %}
+    <nav class="chips scroll wishlist-categories" aria-label="Filter kategori">
+      <a href="{% url 'product_catalog:wishlist' %}" class="chip{% if not selected_category %} active{% endif %}">Semua</a>
+      {% for value, label in categories %}
+        <a href="?category={{ value }}" class="chip{% if selected_category == value %} active{% endif %}">{{ label }}</a>
+      {% endfor %}
+    </nav>
+  {% endif %}
+
+  <div class="product-grid wishlist-grid" id="wishlist-grid">
+    {% for item in items %}
+      <div class="wishlist-item" data-wishlist-item data-product-id="{{ item.product_id }}">
+        {% include "partials/product_card.html" with product=item.product %}
+        <div class="wishlist-note">
+          <p class="wishlist-note-text{% if not item.note %} muted{% endif %}" data-note-text data-empty-text="Belum ada catatan.">{{ item.note|default:"Belum ada catatan." }}</p>
+          <form method="post" action="{% url 'product_catalog:update_note' item.pk %}" class="wishlist-note-form" data-note-form hidden>
+            {% csrf_token %}
+            <label for="note-{{ item.pk }}" class="visually-hidden">Catatan</label>
+            <input type="text" name="note" id="note-{{ item.pk }}" class="input" maxlength="200" value="{{ item.note }}" placeholder="Mis. cocok buat kondangan">
+            <div class="btn-row">
+              <button type="submit" class="btn-primary btn-sm">Simpan</button>
+              <button type="button" class="btn-outline btn-sm" data-note-cancel>Batal</button>
+            </div>
+          </form>
+          <div class="wishlist-actions">
+            <button type="button" class="link-btn underline" data-note-edit>Edit catatan</button>
+            <button type="button" class="link-btn underline danger" data-remove
+                    data-url="{% url 'product_catalog:remove_item' item.pk %}">Hapus</button>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="empty-state" id="wishlist-empty">
+        <h2>Wishlist masih kosong</h2>
+        <p>{% if selected_category %}Belum ada barang di kategori ini.{% else %}Tekan ikon hati di katalog untuk menyimpan barang incaranmu.{% endif %}</p>
+        <a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Jelajahi Katalog</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <template id="wishlist-empty-template">
+    <div class="empty-state">
+      <h2>Wishlist masih kosong</h2>
+      <p>Tekan ikon hati di katalog untuk menyimpan barang incaranmu.</p>
+      <a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Jelajahi Katalog</a>
+    </div>
+  </template>
+</section>
+{% endblock %}
+
+{% block extra_js %}{% wishlist_js %}{% endblock %}
