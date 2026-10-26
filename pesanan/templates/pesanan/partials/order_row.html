@@ -1,0 +1,30 @@
+{% comment %}
+  Satu baris pesanan. Context: o (dict dari services.order_data), role ("buyer"/"seller").
+  Struktur sama dengan renderOrderRow() di pesanan.js.
+{% endcomment %}
+<article class="order-row" data-order-row data-code="{{ o.code }}" data-status="{{ o.status }}">
+  <a href="{{ o.detail_url }}" class="cart-thumb order-thumb" aria-hidden="true" tabindex="-1">
+    {% if o.thumb_url %}<img src="{{ o.thumb_url }}" alt="">{% endif %}
+  </a>
+  <div class="order-main">
+    <a href="{{ o.detail_url }}" class="order-title">{{ o.title }}</a>
+    <p class="order-meta">{{ o.code }} · {{ o.created_display }} · {% if role == "seller" %}{{ o.buyer }}{% else %}{{ o.store_name }}{% endif %}</p>
+  </div>
+  <span class="order-total">{{ o.total_display }}</span>
+  <div class="order-side">
+    {% if role == "seller" and o.status != "dibatalkan" %}
+      <ol class="stepper" aria-label="Status: {{ o.status_display }}">
+        <li class="{% if o.step_index >= 0 %}done{% endif %}">Diproses</li>
+        <li class="{% if o.step_index >= 1 %}done{% endif %}">Dikirim</li>
+        <li class="{% if o.step_index >= 2 %}done{% endif %}">Selesai</li>
+      </ol>
+    {% else %}
+      <span class="badge status-badge status-{{ o.status }}">{{ o.status_display }}</span>
+    {% endif %}
+    <div class="order-actions">
+      {% if o.actions.ship %}<button type="button" class="btn-primary btn-sm" data-order-action="ship" data-url="{{ o.actions.ship }}">Tandai dikirim</button>{% endif %}
+      {% if o.actions.complete %}<button type="button" class="btn-primary btn-sm" data-order-action="complete" data-url="{{ o.actions.complete }}">Pesanan diterima</button>{% endif %}
+      {% if o.actions.cancel %}<button type="button" class="link-btn underline danger" data-order-action="cancel" data-url="{{ o.actions.cancel }}">Batalkan</button>{% endif %}
+    </div>
+  </div>
+</article>

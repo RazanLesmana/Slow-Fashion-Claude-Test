@@ -110,7 +110,10 @@ class LayoutTests(TestCase):
         self.client.login(username="buyer", password="demo12345")
         response = self.client.get(reverse("landing"))
         self.assertContains(response, ">Wishlist<")
-        self.assertContains(response, 'data-seller-nav hidden', count=2)
+        # Semua menu seller di navbar dirender tapi tersembunyi (jumlahnya bisa bertambah per modul).
+        navbar = response.content.decode().split("</nav>")[0]
+        self.assertGreaterEqual(navbar.count("data-seller-nav"), 2)
+        self.assertEqual(navbar.count("data-seller-nav"), navbar.count("data-seller-nav hidden"))
 
     def test_navbar_seller_menu_seller_tampil(self):
         make_user("seller", is_seller=True)

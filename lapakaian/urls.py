@@ -30,6 +30,8 @@ urlpatterns = [
     # product_catalog mengatur path katalog/ dan wishlist/ di dalam app-nya
     path("", include("product_catalog.urls")),
     path("ulasan/", include("ulasan.urls")),
+    # pesanan mengatur path keranjang/, checkout/, dan pesanan/ di dalam app-nya
+    path("", include("pesanan.urls")),
 ]
 
 handler404 = "lapakaian.views.page_not_found"

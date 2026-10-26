@@ -1,0 +1,15 @@
+{% load pesanan_tags %}
+{% if state != "owner" %}{% pesanan_assets %}{% endif %}
+{% if state == "anonymous" %}
+  <a href="{{ login_url }}" class="btn-primary cart-btn{% if compact %} btn-sm{% endif %}">Masuk untuk membeli</a>
+{% elif state == "sold" %}
+  <button type="button" class="btn-primary cart-btn{% if compact %} btn-sm{% endif %}" disabled>Terjual</button>
+{% elif state == "inactive" %}
+  <button type="button" class="btn-primary cart-btn{% if compact %} btn-sm{% endif %}" disabled>Toko tidak aktif</button>
+{% elif state == "in_cart" %}
+  <a href="{% url 'pesanan:keranjang' %}" class="btn-outline cart-btn{% if compact %} btn-sm{% endif %}">Lihat keranjang</a>
+{% elif state == "available" %}
+  <button type="button" class="btn-primary cart-btn{% if compact %} btn-sm{% endif %}" data-cart-add
+          data-url="{% url 'pesanan:cart_add' product.pk %}"
+          data-cart-url="{% url 'pesanan:keranjang' %}">Tambah ke keranjang</button>
+{% endif %}

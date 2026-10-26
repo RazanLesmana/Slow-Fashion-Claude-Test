@@ -1,0 +1,6 @@
+{% comment %}
+  Slot tombol keranjang (milik modul pesanan).
+  Di-include dari listing/product_detail.html dengan context `product`.
+  `compact` (opsional) untuk tombol kecil, mis. di halaman Wishlist.
+{% endcomment %}
+{% load pesanan_tags %}{% cart_button product compact %}

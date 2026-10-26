@@ -1,0 +1,26 @@
+{% comment %}Daftar pesanan dengan tab status. Context: role, orders, counts, status_tabs, title.{% endcomment %}
+<section class="section orders-page" id="orders-page" data-role="{{ role }}" data-json-url="{% url 'pesanan:orders_json' %}">
+  <div class="page-head">
+    <h1>{{ title }}</h1>
+  </div>
+
+  <div class="tabs" role="tablist" id="order-tabs">
+    {% for value, label, count in status_tabs %}
+      <button type="button" class="tab{% if forloop.first %} active{% endif %}" role="tab"
+              aria-selected="{% if forloop.first %}true{% else %}false{% endif %}" data-status="{{ value }}">
+        {{ label }} <span class="count" data-count="{{ value|default:'semua' }}">{{ count }}</span>
+      </button>
+    {% endfor %}
+  </div>
+
+  <div class="order-list" id="order-list" aria-live="polite">
+    {% for o in orders %}
+      {% include "pesanan/partials/order_row.html" %}
+    {% endfor %}
+  </div>
+  <div class="empty-state" id="orders-empty" {% if orders %}hidden{% endif %}>
+    <h2>Belum ada pesanan</h2>
+    <p data-empty-text>{% if role == "seller" %}Pesanan dari pembeli akan muncul di sini.{% else %}Pesanan yang kamu bayar akan muncul di sini.{% endif %}</p>
+    {% if role == "buyer" %}<a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Mulai belanja</a>{% endif %}
+  </div>
+</section>

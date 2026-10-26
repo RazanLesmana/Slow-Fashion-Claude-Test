@@ -34,6 +34,7 @@
               <button type="button" class="btn-outline btn-sm" data-note-cancel>Batal</button>
             </div>
           </form>
+          {% include "pesanan/slots/add_to_cart.html" with product=item.product compact=True %}
           <div class="wishlist-actions">
             <button type="button" class="link-btn underline" data-note-edit>Edit catatan</button>
             <button type="button" class="link-btn underline danger" data-remove

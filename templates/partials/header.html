@@ -21,6 +21,7 @@
 
     {% if user.is_authenticated %}
       <a href="{% url 'product_catalog:wishlist' %}">Wishlist</a>
+      <a href="{% url 'pesanan:pesanan_saya' %}">Pesanan</a>
       {% comment %}
         Menu seller selalu dirender untuk user login, tapi disembunyikan
         (atribut hidden) kalau bukan seller, supaya JS bisa menampilkannya
@@ -28,6 +29,11 @@
       {% endcomment %}
       <a href="{% url 'listing:my_listings' %}" data-seller-nav {% if not user.profile.is_seller %}hidden{% endif %}>My Listings</a>
       <a href="{% url 'profil_toko:toko_saya' %}" data-seller-nav {% if not user.profile.is_seller %}hidden{% endif %}>Toko Saya</a>
+      <a href="{% url 'pesanan:pesanan_masuk' %}" data-seller-nav {% if not user.profile.is_seller %}hidden{% endif %}>Pesanan Masuk</a>
+      <a href="{% url 'pesanan:keranjang' %}" aria-label="Keranjang" style="display:inline-flex;align-items:center;gap:6px">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>
+        <span class="badge badge-active" data-cart-count {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+      </a>
       <a href="{% url 'akun:profil' %}">{{ user.username }}</a>
       <form method="post" action="{% url 'akun:logout' %}" class="nav-logout">
         {% csrf_token %}

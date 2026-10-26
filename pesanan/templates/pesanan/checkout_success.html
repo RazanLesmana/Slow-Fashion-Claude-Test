@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static format_tags %}
+{% block title %}Pembayaran berhasil · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'pesanan/pesanan.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section success-page">
+  <div class="success-box">
+    <p class="eyebrow">Pesanan {% for order in orders %}{{ order.code }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    <h1 class="page-title">Pembayaran diterima</h1>
+    <p>{{ store_names }} akan memproses pesananmu. Statusnya bisa dicek di Pesanan saya.</p>
+
+    {% for order in orders %}
+      <div class="summary-store">
+        <p class="summary-store-name">{{ order.store_name }} · {{ order.code }}</p>
+        {% for item in order.items.all %}
+          <div class="mini-line">
+            <span class="mini-line-info">
+              <span class="mini-line-name">{{ item.product_name }}</span>
+              <span class="cart-line-meta">{% if item.brand %}{{ item.brand }} · {% endif %}{{ item.size }}</span>
+            </span>
+            <span class="mini-line-price">{{ item.price|rupiah }}</span>
+          </div>
+        {% endfor %}
+        <div class="summary-line">
+          <span>Ongkos kirim</span>
+          <span>{{ order.shipping_fee|rupiah }}</span>
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="summary-line summary-total">
+      <span>Total dibayar</span>
+      <span>{{ grand_total|rupiah }}</span>
+    </div>
+    <p class="field-help">Metode: {{ orders.0.get_payment_method_display }} (simulasi)</p>
+
+    <div class="btn-row">
+      <a href="{% url 'pesanan:pesanan_saya' %}" class="btn-primary">Lihat pesanan</a>
+      <a href="{% url 'product_catalog:katalog' %}" class="btn-outline">Lanjut belanja</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
