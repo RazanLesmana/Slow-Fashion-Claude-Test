@@ -9,3 +9,9 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @classmethod
+    def for_user(cls, user):
+        """Ambil Profile user, dibuat kalau belum ada (user lama/superuser)."""
+        profile, _ = cls.objects.get_or_create(user=user)
+        return profile

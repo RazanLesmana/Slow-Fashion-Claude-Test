@@ -6,8 +6,8 @@
     <div class="eyebrow">Thrift Preloved Berkualitas</div>
     <h1>Baju Bagus Layak Dipakai Lagi</h1>
     <p>Beli dan jual pakaian preloved berkualitas, sekaligus mengurangi sampah fashion bersama LaPAKAIAN.</p>
-    <a href="#" class="btn-primary">Belanja Sekarang</a>
-    <a href="{% url 'akun:profil' %}" class="btn-outline">Jadi Seller</a>
+    <a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Belanja Sekarang</a>
+    <a href="{{ seller_cta_url }}" class="btn-outline">Jadi Seller</a>
   </div>
   <div class="hero-image"></div>
 </section>
@@ -15,31 +15,29 @@
 <section class="section">
   <div class="section-head">
     <h2>Kategori</h2>
-    <a href="#">Lihat Semua →</a>
+    <a href="{% url 'product_catalog:katalog' %}">Lihat Semua →</a>
   </div>
   <div class="kategori-grid">
-    <div class="kategori-card">Atasan</div>
-    <div class="kategori-card">Bawahan</div>
-    <div class="kategori-card">Outerwear</div>
-    <div class="kategori-card">Dress</div>
+    {% for value, label in categories %}
+      <a href="{% url 'product_catalog:katalog' %}?category={{ value }}" class="kategori-card">{{ label }}</a>
+    {% endfor %}
   </div>
 </section>
 
 <section class="section">
   <div class="section-head">
     <h2>Baru Masuk</h2>
-    <a href="#">Lihat Katalog →</a>
+    <a href="{% url 'product_catalog:katalog' %}">Lihat Katalog →</a>
   </div>
   <div class="product-grid">
-    {% comment %} Placeholder, nanti diisi data asli dari modul Listing Baju {% endcomment %}
-    {% for i in "12345678" %}
-    <div class="product-card">
-      <div class="product-image"></div>
-      <div class="product-info">
-        <div class="meta">Brand · Size</div>
-        <div class="price">Rp 0</div>
+    {% for product in products %}
+      {% include "partials/product_card.html" %}
+    {% empty %}
+      <div class="empty-state">
+        <h3>Belum ada barang</h3>
+        <p>Produk terbaru dari seller akan tampil di sini.</p>
+        <a href="{{ seller_cta_url }}" class="btn-outline">Jadi yang pertama jualan</a>
       </div>
-    </div>
     {% endfor %}
   </div>
 </section>
@@ -49,7 +47,7 @@
     <h2>Lemari Penuh? Jual di Sini.</h2>
     <p>Buka toko gratis dengan akun yang sama, tambah barang, tentukan harga.</p>
   </div>
-  <a href="{% url 'akun:profil' %}" class="btn-primary">Jadi Seller</a>
+  <a href="{{ seller_cta_url }}" class="btn-primary">Jadi Seller</a>
 </section>
 
 {% endblock %}

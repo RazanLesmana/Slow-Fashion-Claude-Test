@@ -1,0 +1,58 @@
+/* Halaman profil (modul akun) */
+.profil-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.profil-card {
+  border: 1px solid var(--black);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profil-card-head,
+.profil-field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.profil-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.profil-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profil-username {
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.profil-bio { white-space: pre-line; overflow-wrap: anywhere; }
+
+.profil-status { font-weight: 600; }
+
+.profil-danger { border-color: var(--danger); }
+.profil-danger .profil-card-title { color: var(--danger); }
+.profil-danger .btn-danger { align-self: flex-start; margin-right: 0; }
+
+.profil-card .field { margin-bottom: 12px; }
+
+@media (max-width: 600px) {
+  .profil-grid { grid-template-columns: 1fr; }
+  .profil-card { padding: 18px; }
+  .profil-danger .btn-danger { align-self: stretch; text-align: center; }
+}
