@@ -1,5 +1,6 @@
 {% comment %}
   Slot size chart (milik modul profil_toko).
   Di-include dari listing/product_detail.html dengan context `product`.
-  Diisi oleh branch profil-toko.
 {% endcomment %}
+{% load size_chart_tags %}
+{% size_chart_for product %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Buka Toko · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'profil_toko/profil_toko.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="store-form-wrap">
+    <h1 class="page-title">Buka Toko</h1>
+    <p class="muted">Satu akun untuk beli dan jual. Isi profil toko sekali, lalu mulai upload.</p>
+
+    <form method="post" class="store-form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      {% include "profil_toko/partials/field.html" with field=form.name %}
+      {% include "profil_toko/partials/field.html" with field=form.city %}
+      {% include "profil_toko/partials/field.html" with field=form.description counter=300 %}
+      {% include "profil_toko/partials/field.html" with field=form.whatsapp_number %}
+      <div class="btn-row">
+        <button type="submit" class="btn-primary">Buka Toko</button>
+        <a href="{% url 'akun:profil' %}" class="btn-outline">Batal</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'profil_toko/profil_toko.js' %}"></script>{% endblock %}

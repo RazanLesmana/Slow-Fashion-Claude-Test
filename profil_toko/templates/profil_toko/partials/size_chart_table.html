@@ -1,0 +1,26 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'profil_toko/profil_toko.css' %}">
+<div class="size-chart">
+  <div class="size-chart-head">
+    <h2 class="size-chart-title">Ukuran</h2>
+    {% if brand %}<span class="field-help">Size chart {{ brand }}</span>{% endif %}
+  </div>
+  {% if rows %}
+    <table class="size-table">
+      <thead>
+        <tr><th scope="col">Size</th><th scope="col">Lingkar dada</th><th scope="col">Panjang</th></tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr{% if row.size|upper == selected_size %} class="is-selected" aria-current="true"{% endif %}>
+            <td>{{ row.size }}</td>
+            <td>{{ row.chest_cm }} cm</td>
+            <td>{{ row.length_cm }} cm</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted size-chart-empty">Size chart untuk brand ini belum tersedia.</p>
+  {% endif %}
+</div>

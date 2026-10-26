@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ page_title }} · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'profil_toko/profil_toko.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="store-form-wrap">
+    <h1 class="page-title">{{ page_title }}</h1>
+    <p class="muted">Ukur pakaian dalam posisi rata. Lingkar dada = lebar dada × 2.</p>
+    <form method="post" class="store-form" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="field-row">
+        {% include "profil_toko/partials/field.html" with field=form.brand %}
+        {% include "profil_toko/partials/field.html" with field=form.size %}
+      </div>
+      <div class="field-row">
+        {% include "profil_toko/partials/field.html" with field=form.chest_cm %}
+        {% include "profil_toko/partials/field.html" with field=form.length_cm %}
+      </div>
+      <div class="btn-row">
+        <button type="submit" class="btn-primary">Simpan</button>
+        <a href="{% url 'profil_toko:size_chart_list' %}" class="btn-outline">Batal</a>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
