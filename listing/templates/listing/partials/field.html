@@ -1,0 +1,11 @@
+{% comment %}Satu field form dengan label dan error. Context: field, help (opsional).{% endcomment %}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {% if prefix %}
+    <div class="input-prefix"><span>{{ prefix }}</span>{{ field }}</div>
+  {% else %}
+    {{ field }}
+  {% endif %}
+  {% if help %}<p class="field-help">{{ help }}</p>{% endif %}
+  {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+</div>

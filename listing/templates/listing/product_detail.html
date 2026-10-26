@@ -1,83 +1,108 @@
 {% extends "base.html" %}
-{% load format_tags %}
+{% load static format_tags %}
+{% block title %}{{ product.name }} · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'listing/listing.css' %}">{% endblock %}
 
 {% block content %}
-<section class="section">
-    <a href="{% url 'listing:my_listings' %}">
-        &larr; Kembali ke My Listings
+<section class="section product-detail" data-product-id="{{ product.pk }}">
+    <a href="{% if is_owner %}{% url 'listing:my_listings' %}{% else %}{% url 'product_catalog:katalog' %}{% endif %}" class="back-link">
+        &larr; {% if is_owner %}Kembali ke My Listings{% else %}Kembali ke Katalog{% endif %}
     </a>
 
-    <h1>{{ product.name }}</h1>
-
-    <div class="product-images">
-        {% for product_image in product.images.all %}
-            <figure>
-                <img
-                    src="{{ product_image.image.url }}"
-                    alt="{{ product_image.alt_text|default:product.name }}"
-                    width="250"
-                >
-                {% if product_image.alt_text %}
-                    <figcaption>
-                        {{ product_image.alt_text }}
-                    </figcaption>
+    <div class="detail-split">
+        <div class="gallery">
+            {% with images=product.images.all %}
+                {% if images|length > 1 %}
+                    <div class="gallery-thumbs">
+                        {% for product_image in images %}
+                            <button type="button" class="gallery-thumb{% if forloop.first %} active{% endif %}"
+                                    data-src="{{ product_image.image.url }}"
+                                    data-alt="{{ product_image.alt_text|default:product.name }}"
+                                    aria-label="Lihat foto {{ forloop.counter }}">
+                                <img src="{{ product_image.image.url }}" alt="">
+                            </button>
+                        {% endfor %}
+                    </div>
                 {% endif %}
-            </figure>
-        {% empty %}
-            <p>Belum ada foto untuk produk ini.</p>
-        {% endfor %}
-    </div>
+                <div class="gallery-main{% if product.status == 'sold' %} is-sold{% endif %}">
+                    {% if images %}
+                        <img id="gallery-main-img" src="{{ images.0.image.url }}" alt="{{ images.0.alt_text|default:product.name }}">
+                    {% else %}
+                        <div class="img-placeholder gallery-placeholder">Belum ada foto</div>
+                    {% endif %}
+                </div>
+            {% endwith %}
+        </div>
 
-    <div class="product-details">
-        <p>
-            <strong>Brand:</strong>
-            {{ product.brand|default:"Tanpa brand" }}
-        </p>
+        <div class="detail-info">
+            {% if product.brand %}<p class="eyebrow">{{ product.brand }}</p>{% endif %}
+            <h1 class="detail-name">{{ product.name }}</h1>
+            <p class="detail-price">{{ product.price|rupiah }}</p>
 
-        <p>
-            <strong>Deskripsi:</strong>
-            {{ product.description|linebreaksbr }}
-        </p>
+            <div class="detail-badges">
+                <span class="badge badge-size">{{ product.size }}</span>
+                <span class="badge badge-cond">{{ product.get_condition_display }}</span>
+                <span class="badge badge-sold" data-status-badge {% if product.status != "sold" %}hidden{% endif %}>Terjual</span>
+            </div>
 
-        <p>
-            <strong>Kategori:</strong>
-            {{ product.get_category_display }}
-        </p>
+            <div class="detail-actions">
+                {% include "product_catalog/slots/wishlist_button.html" %}
+            </div>
 
-        <p>
-            <strong>Ukuran:</strong>
-            {{ product.size }}
-        </p>
+            {% if is_owner %}
+                <div class="owner-actions" id="owner-actions"
+                     data-my-listings-url="{% url 'listing:my_listings' %}">
+                    <p class="eyebrow">Listing milikmu</p>
+                    <div class="btn-row">
+                        <a href="{% url 'listing:product_edit' product.pk %}" class="btn-primary btn-sm">Edit</a>
+                        <button type="button" class="btn-outline btn-sm" data-status-toggle
+                                data-status="{{ product.status }}"
+                                data-sold-url="{% url 'listing:product_mark_sold' product.pk %}"
+                                data-active-url="{% url 'listing:product_mark_active' product.pk %}">
+                            {% if product.status == "active" %}Tandai Sold{% else %}Tandai Aktif{% endif %}
+                        </button>
+                        <button type="button" class="btn-danger btn-sm" data-delete
+                                data-url="{% url 'listing:product_delete' product.pk %}"
+                                data-name="{{ product.name }}">Hapus</button>
+                    </div>
+                </div>
+            {% endif %}
 
-        <p>
-            <strong>Kondisi:</strong>
-            {{ product.get_condition_display }}
-        </p>
+            <div class="detail-desc">
+                <h2 class="detail-subtitle">Deskripsi</h2>
+                <p>{{ product.description|linebreaksbr }}</p>
+                <p class="meta">Kategori: {{ product.get_category_display }}</p>
+            </div>
 
-        <p>
-            <strong>Harga:</strong>
-            {{ product.price|rupiah }}
-        </p>
+            {% include "profil_toko/slots/size_chart.html" %}
 
-        <p>
-            <strong>Status:</strong>
-            {{ product.get_status_display }}
-        </p>
-    </div>
-
-    {% include "product_catalog/slots/wishlist_button.html" %}
-
-    {% include "profil_toko/slots/size_chart.html" %}
-
-    <div class="product-actions">
-        <a
-            href="{% url 'listing:product_edit' product.pk %}"
-            class="btn-primary"
-        >
-            Edit Produk
-        </a>
+            <a href="{% url 'profil_toko:detail' product.seller.username %}" class="store-link">
+                <span class="avatar">{{ product.seller.store.name|default:product.seller.username|first }}</span>
+                <span class="store-link-text">
+                    <strong>{{ product.seller.store.name|default:product.seller.username }}</strong>
+                    <span class="meta">{{ product.seller.store.city|default:"Seller LaPAKAIAN" }}</span>
+                </span>
+                <span class="link-btn underline">Lihat Toko</span>
+            </a>
+        </div>
     </div>
 
     {% include "ulasan/slots/product_reviews.html" %}
 </section>
+
+{% if same_store %}
+<section class="section">
+    <div class="section-head">
+        <h2>Dari toko yang sama</h2>
+        <a href="{% url 'profil_toko:detail' product.seller.username %}">Lihat Toko →</a>
+    </div>
+    <div class="product-grid">
+        {% for product in same_store %}
+            {% include "partials/product_card.html" %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'listing/listing.js' %}"></script>{% endblock %}

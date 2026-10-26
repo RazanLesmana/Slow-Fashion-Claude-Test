@@ -1,50 +1,82 @@
 {% extends "base.html" %}
+{% load static %}
+{% block title %}{{ page_title }} · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'listing/listing.css' %}">{% endblock %}
 
 {% block content %}
 <section class="section">
-    <h1>{{ page_title }}</h1>
-    <p>Lengkapi informasi produk yang ingin kamu jual.</p>
+    <div class="page-head">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p class="muted">Lengkapi informasi produk yang ingin kamu jual.</p>
+        </div>
+    </div>
 
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="listing-form" id="product-form" novalidate>
         {% csrf_token %}
-
-        <h2>Informasi Produk</h2>
-        {{ form.as_p }}
-
-        {% if form.non_field_errors %}
-            <div class="form-errors">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-
-        <h2>Foto Produk</h2>
-        <p>Unggah maksimal 5 foto untuk satu produk.</p>
-
         {{ image_formset.management_form }}
 
-        {% if image_formset.non_form_errors %}
-            <div class="form-errors">
-                {{ image_formset.non_form_errors }}
+        <div class="listing-photos">
+            <div class="photo-drop" id="photo-drop">
+                <p class="photo-drop-title">Seret foto ke sini</p>
+                <button type="button" class="link-btn underline" id="photo-pick">Pilih foto</button>
+                <p class="field-help">JPG, PNG, atau WEBP, maks. 5 MB. Hingga 5 foto, foto pertama jadi sampul.</p>
             </div>
-        {% endif %}
 
-        {% for image_form in image_formset %}
-            <div class="image-form">
-                {{ image_form.as_p }}
-            </div>
-        {% endfor %}
-
-        <button type="submit" class="btn-primary">
-            {% if product %}
-                Simpan Perubahan
-            {% else %}
-                Simpan Produk
+            {% if image_formset.non_form_errors %}
+                <div class="form-errors">{{ image_formset.non_form_errors }}</div>
             {% endif %}
-        </button>
 
-        <a href="{% url 'listing:my_listings' %}" class="btn-outline">
-            Batal
-        </a>
+            <div class="photo-slots">
+                {% for image_form in image_formset %}
+                    <div class="photo-slot{% if image_form.instance.pk %} filled{% endif %}" data-photo-slot>
+                        {% for hidden in image_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        <label class="photo-slot-label" for="{{ image_form.image.id_for_label }}">
+                            <img class="photo-preview" alt="Preview foto {{ forloop.counter }}"
+                                 {% if image_form.instance.pk %}src="{{ image_form.instance.image.url }}"{% else %}hidden{% endif %}>
+                            <span class="photo-slot-empty" {% if image_form.instance.pk %}hidden{% endif %}>+ Foto {{ forloop.counter }}</span>
+                            <input type="file" class="photo-input" name="{{ image_form.image.html_name }}"
+                                   id="{{ image_form.image.id_for_label }}" accept="image/jpeg,image/png,image/webp">
+                        </label>
+                        {% if image_form.instance.pk %}
+                            <label class="photo-delete">
+                                <input type="checkbox" name="{{ image_form.DELETE.html_name }}"> Hapus
+                            </label>
+                        {% else %}
+                            <button type="button" class="link-btn photo-clear" hidden>Batal</button>
+                        {% endif %}
+                        {% for error in image_form.image.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="listing-fields">
+            {% if form.non_field_errors %}
+                <div class="form-errors">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            {% include "listing/partials/field.html" with field=form.name %}
+            <div class="field-row">
+                {% include "listing/partials/field.html" with field=form.brand %}
+                {% include "listing/partials/field.html" with field=form.category %}
+            </div>
+            <div class="field-row">
+                {% include "listing/partials/field.html" with field=form.size %}
+                {% include "listing/partials/field.html" with field=form.condition %}
+            </div>
+            {% include "listing/partials/field.html" with field=form.price prefix="Rp" %}
+            {% include "listing/partials/field.html" with field=form.description %}
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">
+                    {% if product %}Simpan Perubahan{% else %}Publish Listing{% endif %}
+                </button>
+                <a href="{% if product %}{% url 'listing:product_detail' product.pk %}{% else %}{% url 'listing:my_listings' %}{% endif %}" class="btn-outline">Batal</a>
+            </div>
+        </div>
     </form>
 </section>
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'listing/listing.js' %}"></script>{% endblock %}
