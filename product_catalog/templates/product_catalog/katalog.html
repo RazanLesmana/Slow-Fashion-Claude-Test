@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load wishlist_tags %}
+{% block title %}Katalog · LaPAKAIAN{% endblock %}
+{% block extra_css %}{% wishlist_css %}{% endblock %}
+
+{% block content %}
+<section class="section katalog-page">
+  <form method="get" action="{% url 'product_catalog:katalog' %}" id="katalog-filter" class="katalog-form">
+    <div class="page-head">
+      <h1>Katalog</h1>
+      <div class="katalog-head-right">
+        <span class="muted katalog-count">{{ page_obj.paginator.count }} produk</span>
+        <label for="sort" class="visually-hidden">Urutkan</label>
+        <select name="sort" id="sort" class="input katalog-sort" data-autosubmit>
+          {% for value, label in options.sorts %}
+            <option value="{{ value }}" {% if filters.sort == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="katalog-search">
+      <label for="q" class="visually-hidden">Cari</label>
+      <input type="search" name="q" id="q" class="input" placeholder="Cari nama atau brand" value="{{ filters.q }}">
+      <button type="submit" class="btn-primary">Cari</button>
+    </div>
+
+    <div class="chips scroll katalog-categories" role="radiogroup" aria-label="Kategori">
+      <label class="chip chip-input"><input type="radio" name="category" value="" data-autosubmit {% if not filters.category %}checked{% endif %}> Semua</label>
+      {% for value, label in options.categories %}
+        <label class="chip chip-input"><input type="radio" name="category" value="{{ value }}" data-autosubmit {% if filters.category == value %}checked{% endif %}> {{ label }}</label>
+      {% endfor %}
+    </div>
+
+    <button type="button" class="btn-outline katalog-filter-toggle" id="katalog-filter-toggle"
+            aria-expanded="false" aria-controls="katalog-sidebar">Filter ({{ sidebar_count }})</button>
+
+    <div class="katalog-layout">
+      <aside class="katalog-sidebar" id="katalog-sidebar">
+        <fieldset class="filter-group">
+          <legend class="eyebrow">Brand</legend>
+          {% for brand in options.brands %}
+            <label class="check-label">
+              <input type="checkbox" name="brand" value="{{ brand }}" data-autosubmit {% for b in filters.brand %}{% if b|lower == brand|lower %}checked{% endif %}{% endfor %}>
+              <span>{{ brand }}</span>
+            </label>
+          {% empty %}
+            <p class="field-help">Belum ada brand.</p>
+          {% endfor %}
+        </fieldset>
+
+        <fieldset class="filter-group">
+          <legend class="eyebrow">Size</legend>
+          <div class="chips">
+            {% for size in options.sizes %}
+              <label class="chip chip-input"><input type="checkbox" name="size" value="{{ size }}" data-autosubmit {% for s in filters.size %}{% if s|lower == size|lower %}checked{% endif %}{% endfor %}> {{ size }}</label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="filter-group">
+          <legend class="eyebrow">Kondisi</legend>
+          <div class="chips">
+            {% for value, label in options.conditions %}
+              <label class="chip chip-input"><input type="checkbox" name="condition" value="{{ value }}" data-autosubmit {% if value in filters.condition %}checked{% endif %}> {{ label }}</label>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        <fieldset class="filter-group">
+          <legend class="eyebrow">Harga</legend>
+          <div class="price-range">
+            <div class="input-prefix"><span>Rp</span><input type="number" name="min_price" min="0" step="1000" placeholder="Min" aria-label="Harga minimum" value="{% if filters.min_price is not None %}{{ filters.min_price|floatformat:0 }}{% endif %}"></div>
+            <div class="input-prefix"><span>Rp</span><input type="number" name="max_price" min="0" step="1000" placeholder="Maks" aria-label="Harga maksimum" value="{% if filters.max_price is not None %}{{ filters.max_price|floatformat:0 }}{% endif %}"></div>
+          </div>
+        </fieldset>
+
+        <div class="btn-row">
+          <button type="submit" class="btn-primary btn-sm">Terapkan</button>
+          <a href="{{ clear_url }}" class="btn-outline btn-sm">Reset</a>
+        </div>
+      </aside>
+
+      <div class="katalog-results">
+        {% if active_chips %}
+          <div class="chips active-filters" aria-label="Filter aktif">
+            {% for chip in active_chips %}
+              <a href="{{ chip.url }}" class="chip active" aria-label="Hapus filter {{ chip.label }}">{{ chip.label }} <span aria-hidden="true">×</span></a>
+            {% endfor %}
+            <a href="{{ clear_url }}" class="link-btn underline">Hapus semua</a>
+          </div>
+        {% endif %}
+
+        <div class="product-grid katalog-grid">
+          {% for product in products %}
+            {% include "partials/product_card.html" %}
+          {% empty %}
+            <div class="empty-state">
+              <h2>Produk tidak ditemukan</h2>
+              <p>Coba ubah kata kunci atau kurangi filter.</p>
+              <a href="{% url 'product_catalog:katalog' %}" class="btn-outline">Lihat semua produk</a>
+            </div>
+          {% endfor %}
+        </div>
+
+        {% if page_obj.paginator.num_pages > 1 %}
+          <nav class="pagination" aria-label="Halaman">
+            {% if page_obj.has_previous %}
+              <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">‹</a>
+            {% else %}
+              <span class="disabled">‹</span>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+              {% if num == page_obj.number %}
+                <span class="current" aria-current="page">{{ num }}</span>
+              {% else %}
+                <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ num }}">{{ num }}</a>
+              {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+              <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page_obj.next_page_number }}">›</a>
+            {% else %}
+              <span class="disabled">›</span>
+            {% endif %}
+          </nav>
+          <p class="muted katalog-page-info">Menampilkan {{ page_obj.start_index }}–{{ page_obj.end_index }} dari {{ page_obj.paginator.count }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block extra_js %}{% wishlist_js %}{% endblock %}

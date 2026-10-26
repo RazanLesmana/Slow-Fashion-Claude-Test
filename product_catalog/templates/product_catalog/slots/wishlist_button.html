@@ -1,5 +1,7 @@
 {% comment %}
   Slot tombol wishlist (milik modul product_catalog).
   Di-include dari partials/product_card.html dan listing/product_detail.html
-  dengan context `product`. Diisi oleh branch product-catalog.
+  dengan context `product`. State awal "terisi" ditentukan server lewat
+  template tag wishlist_button (satu query wishlist per request).
 {% endcomment %}
+{% load wishlist_tags %}{% wishlist_button product %}
