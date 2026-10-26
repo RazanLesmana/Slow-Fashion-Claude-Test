@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Pesanan Masuk · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'pesanan/pesanan.css' %}">{% endblock %}
+
+{% block content %}
+  {% include "pesanan/partials/order_list.html" with title="Pesanan masuk" %}
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'pesanan/pesanan.js' %}"></script>{% endblock %}

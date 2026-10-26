@@ -59,6 +59,8 @@ main { min-height: 60vh; }
 
 .nav-links a:hover, .nav-links button:hover { opacity: 0.6; }
 
+.nav-links a, .nav-links button { white-space: nowrap; }
+
 .nav-links .btn-primary { margin-right: 0; }
 .nav-links .btn-primary:hover { opacity: 0.85; }
 
@@ -799,6 +801,11 @@ footer a:hover { opacity: 0.7; }
 .not-found h1 { font-size: 1.4rem; font-weight: 800; text-transform: uppercase; }
 
 /* RESPONSIVE */
+@media (min-width: 601px) and (max-width: 1180px) {
+  /* Menu user login (terutama seller) cukup panjang: biarkan turun ke baris kedua dengan rapi. */
+  .nav-links { flex-wrap: wrap; justify-content: flex-end; gap: 10px 18px; font-size: 0.8rem; }
+}
+
 @media (max-width: 900px) {
   .product-grid { grid-template-columns: repeat(3, 1fr); }
   .nav-links { gap: 18px; }

@@ -1,0 +1,16 @@
+{% load format_tags %}
+{% with product=item.product image=item.product.images.all.0 %}
+<div class="cart-line{% if item.reason %} is-unavailable{% endif %}" data-cart-line data-price="{{ product.price|floatformat:0 }}">
+  <a href="{% url 'listing:product_detail' product.pk %}" class="cart-thumb" aria-hidden="true" tabindex="-1">
+    {% if image %}<img src="{{ image.image.url }}" alt="">{% endif %}
+  </a>
+  <div class="cart-line-info">
+    <a href="{% url 'listing:product_detail' product.pk %}" class="cart-line-name">{{ product.name }}</a>
+    <p class="cart-line-meta">{% if product.brand %}{{ product.brand }} · {% endif %}{{ product.size }} · {{ product.get_condition_display }}</p>
+    {% if item.reason %}<p class="cart-line-reason">{{ item.reason }}</p>{% endif %}
+  </div>
+  <span class="cart-line-price">{{ product.price|rupiah }}</span>
+  <button type="button" class="link-btn underline danger cart-line-remove" data-cart-remove
+          data-url="{% url 'pesanan:cart_remove' item.pk %}" aria-label="Hapus {{ product.name }} dari keranjang">Hapus</button>
+</div>
+{% endwith %}

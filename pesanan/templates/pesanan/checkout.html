@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static format_tags %}
+{% block title %}Checkout · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'pesanan/pesanan.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section checkout-page">
+  <div class="page-head">
+    <h1>Checkout</h1>
+  </div>
+
+  <div class="checkout-layout">
+    <form method="post" action="{% url 'pesanan:checkout' %}" id="checkout-form" class="checkout-form" novalidate>
+      {% csrf_token %}
+      {% for item in cart.available %}<input type="hidden" name="product_ids" value="{{ item.product_id }}">{% endfor %}
+
+      {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+      <fieldset class="checkout-block">
+        <legend class="checkout-block-title">Alamat pengiriman</legend>
+        <div class="field-row">
+          {% include "pesanan/partials/field.html" with field=form.recipient_name %}
+          {% include "pesanan/partials/field.html" with field=form.phone %}
+        </div>
+        {% include "pesanan/partials/field.html" with field=form.address %}
+        <div class="field-row">
+          {% include "pesanan/partials/field.html" with field=form.city %}
+          {% include "pesanan/partials/field.html" with field=form.postal_code %}
+        </div>
+      </fieldset>
+
+      <fieldset class="checkout-block">
+        <legend class="checkout-block-title">Pembayaran</legend>
+        <div class="pay-options">
+          {% for radio in form.payment_method %}
+            <label class="pay-option" for="{{ radio.id_for_label }}">
+              {{ radio.tag }}
+              <span class="pay-radio" aria-hidden="true"></span>
+              <span>{{ radio.choice_label }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        {% for error in form.payment_method.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        <p class="field-help">Pembayaran di aplikasi ini hanya simulasi.</p>
+      </fieldset>
+    </form>
+
+    <aside class="summary-panel" aria-label="Ringkasan pesanan">
+      <h2 class="summary-title">Pesanan</h2>
+      {% for group in cart.groups %}
+        <div class="summary-store">
+          <p class="summary-store-name">{{ group.store_name }}</p>
+          {% for item in group.items %}
+            {% with product=item.product image=item.product.images.all.0 %}
+            <div class="mini-line">
+              <span class="cart-thumb mini-thumb">{% if image %}<img src="{{ image.image.url }}" alt="">{% endif %}</span>
+              <span class="mini-line-info">
+                <span class="mini-line-name">{{ product.name }}</span>
+                <span class="cart-line-meta">{% if product.brand %}{{ product.brand }} · {% endif %}{{ product.size }}</span>
+              </span>
+              <span class="mini-line-price">{{ product.price|rupiah }}</span>
+            </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <div class="summary-line">
+        <span>Subtotal</span>
+        <span>{{ cart.subtotal|rupiah }}</span>
+      </div>
+      <div class="summary-line">
+        <span>Ongkos kirim{% if cart.store_count > 1 %} ({{ shipping_per_store|rupiah }} × {{ cart.store_count }} toko){% endif %}</span>
+        <span>{{ cart.shipping|rupiah }}</span>
+      </div>
+      <div class="summary-line summary-total">
+        <span>Total</span>
+        <span>{{ cart.total|rupiah }}</span>
+      </div>
+      <button type="submit" form="checkout-form" class="btn-primary btn-block" id="pay-btn">Bayar sekarang</button>
+      <a href="{% url 'pesanan:keranjang' %}" class="link-btn underline summary-back">Kembali ke keranjang</a>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'pesanan/pesanan.js' %}"></script>{% endblock %}

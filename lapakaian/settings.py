@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "profil_toko",
     "product_catalog",
     "ulasan",
+    "pesanan",
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pesanan.context_processors.cart_count',
             ],
         },
     },

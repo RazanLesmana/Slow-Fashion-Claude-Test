@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static format_tags pesanan_tags %}
+{% block title %}{{ order.code }} · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'pesanan/pesanan.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section order-detail-page" id="order-detail" data-code="{{ order.code }}">
+  <a href="{% if is_buyer %}{% url 'pesanan:pesanan_saya' %}{% else %}{% url 'pesanan:pesanan_masuk' %}{% endif %}" class="back-link">
+    &larr; {% if is_buyer %}Pesanan saya{% else %}Pesanan masuk{% endif %}
+  </a>
+
+  <div class="page-head">
+    <div>
+      <p class="eyebrow">{% if is_buyer %}Dari {{ order.store_name }}{% else %}Pembeli: {{ order.buyer.username }}{% endif %}</p>
+      <h1>{{ order.code }}</h1>
+    </div>
+    <span class="badge status-badge status-{{ order.status }}" data-detail-status>{{ order.get_status_display }}</span>
+  </div>
+
+  <div class="order-detail-layout">
+    <div class="order-detail-main">
+      <div class="detail-block">
+        <h2 class="checkout-block-title">Barang</h2>
+        {% for item in order.items.all %}
+          {% with image=item.product.images.all.0 %}
+          <div class="mini-line">
+            <span class="cart-thumb mini-thumb">{% if image %}<img src="{{ image.image.url }}" alt="">{% endif %}</span>
+            <span class="mini-line-info">
+              {% if item.product_id %}
+                <a href="{% url 'listing:product_detail' item.product_id %}" class="mini-line-name">{{ item.product_name }}</a>
+              {% else %}
+                <span class="mini-line-name">{{ item.product_name }}</span>
+              {% endif %}
+              <span class="cart-line-meta">{% if item.brand %}{{ item.brand }} · {% endif %}{{ item.size }}</span>
+            </span>
+            <span class="mini-line-price">{{ item.price|rupiah }}</span>
+          </div>
+          {% endwith %}
+        {% endfor %}
+      </div>
+
+      <div class="detail-block">
+        <h2 class="checkout-block-title">Alamat pengiriman</h2>
+        <p class="address-name">{{ order.recipient_name }} · {{ order.phone }}</p>
+        <p>{{ order.address|linebreaksbr }}</p>
+        <p>{{ order.city }} {{ order.postal_code }}</p>
+      </div>
+
+      <div class="detail-block">
+        <h2 class="checkout-block-title">Riwayat</h2>
+        <ol class="timeline">
+          <li class="done">Dibuat &amp; dibayar <span class="muted">{{ order.paid_at|default:order.created_at|tanggal:True }}</span></li>
+          {% if order.shipped_at %}<li class="done">Dikirim <span class="muted">{{ order.shipped_at|tanggal:True }}</span></li>{% endif %}
+          {% if order.completed_at %}<li class="done">Selesai (diterima pembeli) <span class="muted">{{ order.completed_at|tanggal:True }}</span></li>{% endif %}
+          {% if order.cancelled_at %}<li class="done">Dibatalkan{% if order.cancelled_by %} oleh {% if order.cancelled_by_id == order.buyer_id %}pembeli{% else %}seller{% endif %}{% endif %} <span class="muted">{{ order.cancelled_at|tanggal:True }}</span></li>{% endif %}
+        </ol>
+      </div>
+    </div>
+
+    <aside class="summary-panel">
+      <h2 class="summary-title">Pembayaran</h2>
+      <div class="summary-line"><span>Metode</span><span>{{ order.get_payment_method_display }}</span></div>
+      <div class="summary-line"><span>Subtotal ({{ order.items.all|length }} barang)</span><span>{{ order.subtotal|rupiah }}</span></div>
+      <div class="summary-line"><span>Ongkos kirim</span><span>{{ order.shipping_fee|rupiah }}</span></div>
+      <div class="summary-line summary-total"><span>Total</span><span>{{ order.total|rupiah }}</span></div>
+
+      <div class="order-actions detail-actions-col" id="detail-actions">
+        {% if data.actions.ship %}<button type="button" class="btn-primary btn-block" data-order-action="ship" data-url="{{ data.actions.ship }}">Tandai dikirim</button>{% endif %}
+        {% if data.actions.complete %}<button type="button" class="btn-primary btn-block" data-order-action="complete" data-url="{{ data.actions.complete }}">Pesanan diterima</button>{% endif %}
+        {% if data.actions.cancel %}<button type="button" class="btn-danger btn-block" data-order-action="cancel" data-url="{{ data.actions.cancel }}">Batalkan pesanan</button>{% endif %}
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'pesanan/pesanan.js' %}"></script>{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% load static format_tags %}
+{% block title %}Keranjang · LaPAKAIAN{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'pesanan/pesanan.css' %}">{% endblock %}
+
+{% block content %}
+<section class="section cart-page" id="cart-page">
+  <div class="page-head">
+    <h1>Keranjang</h1>
+    <span class="muted" id="cart-heading" {% if not cart.item_count %}hidden{% endif %}>
+      <span data-summary="item_count">{{ cart.item_count }}</span> barang dari <span data-summary="store_count">{{ cart.store_count }}</span> toko
+    </span>
+  </div>
+
+  <div class="cart-layout" id="cart-layout" {% if not cart.groups and not cart.unavailable %}hidden{% endif %}>
+    <div class="cart-groups">
+      {% for group in cart.groups %}
+        <section class="cart-group" data-cart-group>
+          <a href="{% url 'profil_toko:detail' group.seller.username %}" class="cart-group-title">{{ group.store_name }}</a>
+          {% for item in group.items %}
+            {% include "pesanan/partials/cart_line.html" %}
+          {% endfor %}
+        </section>
+      {% endfor %}
+
+      {% if cart.unavailable %}
+        <section class="cart-group cart-group-unavailable" data-cart-group>
+          <p class="cart-group-title">Tidak tersedia lagi</p>
+          <p class="field-help">Barang di bawah tidak ikut di-checkout. Hapus dari keranjang kalau sudah tidak perlu.</p>
+          {% for item in cart.unavailable %}
+            {% include "pesanan/partials/cart_line.html" %}
+          {% endfor %}
+        </section>
+      {% endif %}
+    </div>
+
+    <aside class="summary-panel" aria-label="Ringkasan">
+      <h2 class="summary-title">Ringkasan</h2>
+      <div class="summary-line">
+        <span>Subtotal (<span data-summary="item_count">{{ cart.item_count }}</span> barang)</span>
+        <span data-summary="subtotal_display">{{ cart.subtotal|rupiah }}</span>
+      </div>
+      <div class="summary-line">
+        <span>Ongkos kirim</span>
+        <span class="muted">Dihitung saat checkout</span>
+      </div>
+      <div class="summary-line summary-total">
+        <span>Total</span>
+        <span data-summary="subtotal_display">{{ cart.subtotal|rupiah }}</span>
+      </div>
+      <a href="{% url 'pesanan:checkout' %}" class="btn-primary btn-block" id="checkout-btn"
+         {% if not cart.item_count %}hidden{% endif %}>Checkout</a>
+      <button type="button" class="btn-primary btn-block" id="checkout-btn-disabled" disabled
+              {% if cart.item_count %}hidden{% endif %}>Checkout</button>
+    </aside>
+  </div>
+
+  <div class="empty-state" id="cart-empty" {% if cart.groups or cart.unavailable %}hidden{% endif %}>
+    <h2>Keranjangmu kosong</h2>
+    <p>Temukan baju preloved incaranmu di katalog.</p>
+    <a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Ke Katalog</a>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}<script src="{% static 'pesanan/pesanan.js' %}"></script>{% endblock %}
