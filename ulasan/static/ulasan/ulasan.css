@@ -1,0 +1,140 @@
+/* ===== Blok ulasan (produk & toko) ===== */
+.reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--black);
+}
+
+.store-reviews .reviews { margin-top: 0; padding-top: 0; border-top: none; }
+
+.reviews-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.reviews-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 0.9rem;
+}
+
+.reviews-avg { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+
+.reviews-sort .input { width: auto; min-width: 180px; padding-top: 8px; padding-bottom: 8px; }
+
+.reviews-note { font-size: 0.9rem; }
+
+.stars { display: inline-flex; gap: 1px; letter-spacing: 0; }
+.star { color: var(--placeholder); font-size: 1rem; line-height: 1; }
+.star.on { color: var(--black); }
+
+/* ===== Form ulasan: rating bintang (radio) ===== */
+.review-form, .review-edit-form {
+  border: 1px solid var(--black);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-form .field, .review-edit-form .field { margin-bottom: 0; }
+.review-form .btn-primary, .review-edit-form .btn-primary { align-self: flex-start; }
+
+.star-input { border: none; }
+.star-input legend { margin-bottom: 6px; }
+
+.star-input-row {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.star-input-row input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.star-input-row label {
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--placeholder);
+  cursor: pointer;
+  -webkit-text-stroke: 1px var(--black);
+}
+
+/* Bintang terpilih dan semua bintang di kirinya (urutan DOM 5..1, tampil 1..5). */
+.star-input-row input:checked ~ label,
+.star-input-row label:hover,
+.star-input-row label:hover ~ label { color: var(--black); }
+
+.star-input-row input:focus-visible + label { outline: 2px solid var(--black); outline-offset: 2px; }
+
+/* ===== Daftar ulasan ===== */
+.review-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.review-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--black);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.review-item:first-child { border-top: 1px solid var(--black); }
+.review-item.is-new { background: var(--placeholder); }
+
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar { width: 36px; height: 36px; font-size: 0.85rem; }
+
+.review-who { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.3; }
+.review-author { font-size: 0.85rem; text-transform: uppercase; overflow-wrap: anywhere; }
+.review-date { font-size: 0.75rem; }
+
+.review-comment { font-size: 0.9rem; overflow-wrap: anywhere; }
+
+.review-actions { display: flex; gap: 16px; font-size: 0.75rem; }
+
+.reviews-empty { font-size: 0.9rem; }
+
+.reviews.is-loading .review-list { opacity: 0.5; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .reviews-sort, .reviews-sort .input { width: 100%; }
+  .review-form, .review-edit-form { padding: 14px; }
+}
