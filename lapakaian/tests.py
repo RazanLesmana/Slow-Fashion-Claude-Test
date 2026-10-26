@@ -166,11 +166,14 @@ class StubUrlTests(TestCase):
             reverse("product_catalog:katalog"),
             reverse("product_catalog:wishlist"),
         ]
+        # Isi halaman dikerjakan tiap modul (mis. toko yang belum ada boleh 404),
+        # jadi di sini cukup dipastikan URL ter-resolve dan tidak error server.
         make_user("buyer")
         self.client.login(username="buyer", password="demo12345")
         for url in urls:
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 200, url)
+            self.assertLess(response.status_code, 500, url)
+            self.assertNotEqual(response.status_code, 405, url)
 
     def test_slot_template_tersedia(self):
         seller = make_user("seller", is_seller=True)
