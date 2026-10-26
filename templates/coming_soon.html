@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · LaPAKAIAN{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="empty-state">
+    <h1>{{ title }}</h1>
+    <p>Segera hadir. Halaman ini sedang dikerjakan.</p>
+    <a href="{% url 'landing' %}" class="btn-outline">Ke Beranda</a>
+  </div>
+</section>
+{% endblock %}

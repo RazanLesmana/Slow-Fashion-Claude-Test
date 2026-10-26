@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Halaman tidak ditemukan · LaPAKAIAN{% endblock %}
+{% block content %}
+<section class="section not-found">
+  <p class="not-found-code">404</p>
+  <h1>Halaman tidak ditemukan</h1>
+  <p class="muted">Mungkin barangnya sudah terjual atau link-nya salah.</p>
+  <div class="btn-row">
+    <a href="{% url 'product_catalog:katalog' %}" class="btn-primary">Ke Katalog</a>
+    <a href="{% url 'landing' %}" class="btn-outline">Ke Beranda</a>
+  </div>
+</section>
+{% endblock %}

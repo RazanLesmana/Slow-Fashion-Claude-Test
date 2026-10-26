@@ -1,12 +1,43 @@
 {% extends "base.html" %}
+{% block title %}Daftar · LaPAKAIAN{% endblock %}
 {% block content %}
-<div class="auth-box">
-  <h2>Daftar Akun</h2>
-  <form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn-primary">Daftar</button>
-  </form>
-  <p>Sudah punya akun? <a href="{% url 'akun:login' %}">Masuk</a></p>
-</div>
+<section class="auth-split">
+  <div class="auth-box">
+    <h1>Daftar</h1>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="field{% if form.username.errors %} has-error{% endif %}">
+        <label for="{{ form.username.id_for_label }}">Nama pengguna</label>
+        <input type="text" name="{{ form.username.html_name }}" id="{{ form.username.id_for_label }}"
+               value="{{ form.username.value|default_if_none:'' }}" maxlength="150" autocomplete="username" autofocus required>
+        <p class="field-help">Maks. 150 karakter: huruf, angka, dan @/./+/-/_ saja.</p>
+        {% for error in form.username.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="field{% if form.password1.errors %} has-error{% endif %}">
+        <label for="{{ form.password1.id_for_label }}">Password</label>
+        <input type="password" name="{{ form.password1.html_name }}" id="{{ form.password1.id_for_label }}"
+               autocomplete="new-password" required>
+        <p class="field-help">Minimal 8 karakter dan tidak hanya angka.</p>
+        {% for error in form.password1.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div class="field{% if form.password2.errors %} has-error{% endif %}">
+        <label for="{{ form.password2.id_for_label }}">Ulangi password</label>
+        <input type="password" name="{{ form.password2.html_name }}" id="{{ form.password2.id_for_label }}"
+               autocomplete="new-password" required>
+        {% for error in form.password2.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <button type="submit" class="btn-primary btn-block">Buat akun</button>
+    </form>
+    <p>Sudah punya akun? <a href="{% url 'akun:login' %}" class="text-link">Masuk</a></p>
+  </div>
+  <div class="auth-photo img-placeholder" aria-hidden="true">Foto editorial</div>
+</section>
 {% endblock %}
